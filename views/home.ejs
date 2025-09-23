@@ -1,0 +1,13 @@
+<div class="p-5 mb-4 bg-light rounded-3">
+  <div class="container py-5">
+    <h1 class="display-5 fw-bold">SimpleQuiz</h1>
+    <p class="col-md-8 fs-4">Assignment 2 UI — manage Questions and Quizzes via API.</p>
+    <div class="alert alert-info" role="alert">
+      MongoDB: <span class="fw-bold"><%= (process.env.MONGODB_URI || 'mongodb://localhost:27017') %></span>
+      — DB: <span class="fw-bold"><%= (process.env.MONGODB_DB_NAME || 'SimpleQuiz') %></span>
+    </div>
+    <a class="btn btn-primary btn-lg me-2" href="/questions">Manage Questions</a>
+    <a class="btn btn-outline-secondary btn-lg" href="/quizzes">Manage Quizzes</a>
+  </div>
+</div>
+

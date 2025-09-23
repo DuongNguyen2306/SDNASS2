@@ -1,0 +1,27 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Question Detail</h2>
+  <div>
+    <a class="btn btn-outline-primary" href="/questions/<%= question._id %>/edit">Edit</a>
+    <a class="btn btn-secondary" href="/questions">Back</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title"><%= question.text %></h5>
+    <h6 class="card-subtitle mb-2 text-muted">Correct Index: <%= question.correctAnswerIndex %></h6>
+    <p class="card-text mb-1 fw-semibold">Options</p>
+    <ol class="mb-3">
+      <% (question.options || []).forEach(opt => { %>
+        <li><%= opt %></li>
+      <% }) %>
+    </ol>
+    <p class="card-text mb-1 fw-semibold">Keywords</p>
+    <p>
+      <% (question.keywords || []).forEach(k => { %>
+        <span class="badge bg-secondary me-1"><%= k %></span>
+      <% }) %>
+    </p>
+  </div>
+</div>
+

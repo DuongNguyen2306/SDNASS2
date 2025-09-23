@@ -1,0 +1,58 @@
+<h2><%= mode === 'edit' ? 'Edit Quiz' : 'Create Quiz' %></h2>
+
+<form action="<%= mode === 'edit' ? ('/quizzes/' + quiz._id + '?_method=PUT') : '/quizzes' %>" method="post" class="mt-3">
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input type="text" name="title" class="form-control" value="<%= quiz.title || '' %>" required />
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Description</label>
+    <textarea name="description" class="form-control" rows="3"><%= quiz.description || '' %></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Question IDs (optional, comma separated)</label>
+    <input type="text" name="questionIds" class="form-control" value="<%= (quiz.questions || []).map(q => q._id || q).join(', ') %>" placeholder="650f..., 6510..., 6511..." />
+    <div class="form-text">You can paste existing Question IDs to attach to this quiz.</div>
+  </div>
+
+  <div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary"><%= mode === 'edit' ? 'Update' : 'Create' %></button>
+    <a href="/quizzes" class="btn btn-secondary">Cancel</a>
+  </div>
+</form>
+
+<% if (mode === 'edit') { %>
+  <hr class="my-4" />
+  <h4>Add New Question (inline)</h4>
+  <form action="/quizzes/<%= quiz._id %>/question" method="post" class="mt-3">
+    <div class="mb-3">
+      <label class="form-label">Text</label>
+      <input type="text" name="text" class="form-control" placeholder="What is the capital of France?" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Options (one per line)</label>
+      <textarea name="options" class="form-control" rows="4" placeholder="Paris\nLondon\nRome\nBerlin"></textarea>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Correct Answer Index</label>
+        <select name="correctAnswerIndex" class="form-select">
+          <% for (let i = 0; i < 6; i++) { %>
+            <option value="<%= i %>"><%= i %></option>
+          <% } %>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Keywords (comma separated)</label>
+        <input type="text" name="keywords" class="form-control" placeholder="capital, Europe" />
+      </div>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+      <button type="submit" class="btn btn-success">Add Question</button>
+      <a class="btn btn-outline-secondary" href="/quizzes/<%= quiz._id %>/questions/new">Add Multiple (JSON)</a>
+    </div>
+  </form>
+<% } %>
+

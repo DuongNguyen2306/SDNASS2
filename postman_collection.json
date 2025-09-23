@@ -1,0 +1,92 @@
+{
+  "info": {
+    "name": "SimpleQuiz API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Quiz",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{baseUrl}}/quizzes", "host": ["{{baseUrl}}"], "path": ["quizzes"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Geography\",\n  \"description\": \"Basic quiz\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Add single question to quiz",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{baseUrl}}/quizzes/{{quizId}}/question", "host": ["{{baseUrl}}"], "path": ["quizzes","{{quizId}}","question"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"What is the capital of France?\",\n  \"options\": [\"Paris\", \"Lyon\"],\n  \"keywords\": [\"capital\", \"france\"],\n  \"correctAnswerIndex\": 0\n}"
+        }
+      }
+    },
+    {
+      "name": "Add many questions to quiz",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{baseUrl}}/quizzes/{{quizId}}/questions", "host": ["{{baseUrl}}"], "path": ["quizzes","{{quizId}}","questions"] },
+        "body": {
+          "mode": "raw",
+          "raw": "[{\n  \"text\": \"Capital of Germany?\",\n  \"options\": [\"Berlin\", \"Munich\"],\n  \"keywords\": [\"capital\"],\n  \"correctAnswerIndex\": 0\n}]"
+        }
+      }
+    },
+    {
+      "name": "Create question (invalid options)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{baseUrl}}/questions", "host": ["{{baseUrl}}"], "path": ["questions"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"Invalid\",\n  \"options\": [\"OnlyOne\"],\n  \"correctAnswerIndex\": 0\n}"
+        }
+      }
+    },
+    {
+      "name": "Get question by id (404 example)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/questions/123456789012345678901234", "host": ["{{baseUrl}}"], "path": ["questions","123456789012345678901234"] }
+      }
+    },
+    {
+      "name": "Delete question",
+      "request": {
+        "method": "DELETE",
+        "url": { "raw": "{{baseUrl}}/questions/{{questionId}}", "host": ["{{baseUrl}}"], "path": ["questions","{{questionId}}"] }
+      }
+    },
+    {
+      "name": "Get quiz with capital questions",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/quizzes/{{quizId}}/populate", "host": ["{{baseUrl}}"], "path": ["quizzes","{{quizId}}","populate"] }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "quizId", "value": "" },
+    { "key": "questionId", "value": "" }
+  ]
+}
+
+
