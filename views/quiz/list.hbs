@@ -1,0 +1,47 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Quizzes</h2>
+  <a href="/quiz/new" class="btn btn-primary">Create New Quiz</a>
+</div>
+
+{{#if error}}
+  <div class="alert alert-warning">{{error}}</div>
+{{/if}}
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Questions</th>
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#if quizzes.length}}
+        {{#each quizzes}}
+          <tr>
+            <td>{{@index}}</td>
+            <td><a href="/quiz/{{_id}}">{{title}}</a></td>
+            <td>{{description}}</td>
+            <td><span class="badge bg-info">{{questions.length}}</span></td>
+            <td class="text-end">
+              <div class="btn-group" role="group">
+                <a href="/quiz/{{_id}}" class="btn btn-sm btn-outline-primary">View</a>
+                <a href="/quiz/{{_id}}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <form action="/quiz/{{_id}}?_method=DELETE" method="post" class="d-inline">
+                  <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this quiz?')">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {{/each}}
+      {{else}}
+        <tr>
+          <td colspan="5" class="text-center text-muted">No quizzes found.</td>
+        </tr>
+      {{/if}}
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,44 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>Question Details</h1>
+      <div class="btn-group">
+        <a href="/questions/{{question._id}}/edit" class="btn btn-warning">Edit Question</a>
+        <a href="/questions" class="btn btn-secondary">Back to List</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h3 class="card-title">{{question.text}}</h3>
+        
+        <div class="mt-4">
+          <h5>Options:</h5>
+          <div class="list-group">
+            {{#each question.options}}
+              <div class="list-group-item {{#if (eq @index ../question.correctAnswerIndex)}}list-group-item-success{{/if}}">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span>{{this}}</span>
+                  {{#if (eq @index ../question.correctAnswerIndex)}}
+                    <span class="badge bg-success">Correct Answer</span>
+                  {{/if}}
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+
+        {{#if question.keywords.length}}
+          <div class="mt-4">
+            <h5>Keywords:</h5>
+            <div>
+              {{#each question.keywords}}
+                <span class="badge bg-secondary me-1">{{this}}</span>
+              {{/each}}
+            </div>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>

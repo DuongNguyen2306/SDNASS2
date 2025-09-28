@@ -5,9 +5,18 @@ const api = axios.create({ baseURL: process.env.API_BASE_URL || 'http://localhos
 
 async function list(req, res, next) {
     try {
+        console.log('🔍 Fetching questions from API...');
         const { data } = await api.get('/questions');
-        res.render('questions/list', { title: 'Questions', questions: data });
+        console.log('📡 API response data:', JSON.stringify(data, null, 2));
+        
+        // Xử lý response format từ backend
+        const questions = data.success ? data.data : data;
+        console.log('📋 Processed questions for rendering:', JSON.stringify(questions, null, 2));
+        console.log('📊 Questions count:', Array.isArray(questions) ? questions.length : 'Not an array');
+        
+        res.render('questions/list', { title: 'Questions', questions: questions });
     } catch (err) {
+        console.error('❌ Error fetching questions:', err);
         res.render('questions/list', { title: 'Questions', questions: [], error: 'API error: ' + parseAxiosError(err) });
     }
 }
@@ -30,7 +39,9 @@ async function detail(req, res, next) {
     try {
         const { id } = req.params;
         const { data } = await api.get(`/questions/${id}`);
-        res.render('questions/detail', { title: 'Question Detail', question: data });
+        // Xử lý response format từ backend
+        const question = data.success ? data.data : data;
+        res.render('questions/details', { title: 'Question Detail', question: question });
     } catch (err) {
         next(err);
     }
@@ -40,7 +51,9 @@ async function showEditForm(req, res, next) {
     try {
         const { id } = req.params;
         const { data } = await api.get(`/questions/${id}`);
-        res.render('questions/form', { title: 'Edit Question', mode: 'edit', question: data });
+        // Xử lý response format từ backend
+        const question = data.success ? data.data : data;
+        res.render('questions/edit', { title: 'Edit Question', question: question });
     } catch (err) {
         next(err);
     }

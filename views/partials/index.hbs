@@ -1,0 +1,65 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <h1 class="display-4 mb-4">Question Bank Management</h1>
+      <p class="lead mb-5">Hệ thống quản lý câu hỏi và quiz trực tuyến</p>
+      
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <i class="fas fa-question-circle fa-3x text-primary mb-3"></i>
+              <h3 class="card-title">Quản lý Câu hỏi</h3>
+              <p class="card-text">Tạo, chỉnh sửa và quản lý các câu hỏi trắc nghiệm</p>
+              <a href="/questions" class="btn btn-primary btn-lg">Quản lý Questions</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <i class="fas fa-clipboard-list fa-3x text-success mb-3"></i>
+              <h3 class="card-title">Quản lý Quiz</h3>
+              <p class="card-text">Tạo và quản lý các bài quiz từ các câu hỏi</p>
+              <a href="/quizzes" class="btn btn-success btn-lg">Quản lý Quizzes</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row mt-5">
+        <div class="col-12">
+          <div class="card bg-light">
+            <div class="card-body">
+              <h4 class="card-title">API Endpoints</h4>
+              <p class="card-text">Backend API đang chạy tại: <code>http://localhost:3000</code></p>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Quiz API:</h6>
+                  <ul class="list-unstyled">
+                    <li><code>GET /api/quizzes</code> - Lấy danh sách quiz</li>
+                    <li><code>POST /api/quizzes</code> - Tạo quiz mới</li>
+                    <li><code>GET /api/quizzes/:id</code> - Lấy quiz theo ID</li>
+                  </ul>
+                </div>
+                <div class="col-md-6">
+                  <h6>Question API:</h6>
+                  <ul class="list-unstyled">
+                    <li><code>GET /api/questions</code> - Lấy danh sách questions</li>
+                    <li><code>POST /api/questions</code> - Tạo question mới</li>
+                    <li><code>GET /api/questions/:id</code> - Lấy question theo ID</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="mt-3">
+                <a href="http://localhost:3000/api/info" target="_blank" class="btn btn-outline-primary">Xem API Info</a>
+                <a href="http://localhost:3000/health" target="_blank" class="btn btn-outline-success">Health Check</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

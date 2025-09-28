@@ -1,0 +1,46 @@
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h1>Edit Question</h1>
+    
+    {{#if error}}
+      <div class="alert alert-danger" role="alert">
+        {{error}}
+      </div>
+    {{/if}}
+
+    <form method="POST" action="/questions/{{question._id}}?_method=PUT">
+      <div class="mb-3">
+        <label for="text" class="form-label">Question Text</label>
+        <textarea class="form-control" id="text" name="text" rows="3" required>{{question.text}}</textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="options" class="form-label">Options (comma separated)</label>
+        <input type="text" class="form-control" id="options" name="options" 
+               value="{{#if question.options}}{{question.options}}{{/if}}" 
+               placeholder="Option 1, Option 2, Option 3, Option 4" required>
+        <div class="form-text">Separate multiple options with commas</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="correctAnswerIndex" class="form-label">Correct Answer Index</label>
+        <input type="number" class="form-control" id="correctAnswerIndex" name="correctAnswerIndex" 
+               value="{{question.correctAnswerIndex}}" min="0" required>
+        <div class="form-text">Enter the index (0-based) of the correct answer</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="keywords" class="form-label">Keywords (comma separated)</label>
+        <input type="text" class="form-control" id="keywords" name="keywords" 
+               value="{{#if question.keywords}}{{question.keywords}}{{/if}}" 
+               placeholder="keyword1, keyword2, keyword3">
+        <div class="form-text">Optional: Add keywords to help categorize this question</div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Update Question</button>
+        <a href="/questions/{{question._id}}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

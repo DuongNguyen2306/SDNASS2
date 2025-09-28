@@ -1,0 +1,259 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Create New Quiz</h1>
+  <a href="/quiz" class="btn btn-secondary">Back to Quizzes</a>
+</div>
+
+{{#if error}}
+  <div class="alert alert-danger">{{error}}</div>
+{{/if}}
+
+{{#if success}}
+  <div class="alert alert-success">{{success}}</div>
+{{/if}}
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Quiz Information</h5>
+      </div>
+      <div class="card-body">
+        <form action="/quiz" method="post" id="createQuizForm">
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{quiz.title}}" placeholder="e.g., History Quiz" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="e.g., Test your knowledge of historical events">{{quiz.description}}</textarea>
+          </div>
+          
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Create Quiz</button>
+            <a href="/quiz" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Questions in Quiz</h5>
+        <span class="badge bg-primary" id="questionCount">0 questions</span>
+      </div>
+      <div class="card-body">
+        <div id="questionsList">
+          <div class="text-center py-3">
+            <p class="text-muted">No questions added yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0">Add Questions</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <button type="button" class="btn btn-success" onclick="createNewQuestion()">Create New Question</button>
+          <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addExistingQuestionModal">
+            Add Existing Question
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for adding existing question -->
+<div class="modal fade" id="addExistingQuestionModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Existing Question</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="searchQuestion" class="form-label">Search Questions</label>
+          <input type="text" class="form-control" id="searchQuestion" placeholder="Type to search questions..." onkeyup="filterQuestions()">
+        </div>
+        <div id="questionsList" style="max-height: 400px; overflow-y: auto;">
+          <!-- Questions will be loaded here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let allQuestions = [];
+let selectedQuestions = [];
+
+// Load questions when modal opens
+document.getElementById('addExistingQuestionModal').addEventListener('show.bs.modal', function () {
+  loadQuestions();
+});
+
+// Load all questions
+async function loadQuestions() {
+  try {
+    console.log('🔍 Loading questions for modal...');
+    const response = await fetch('/questions', {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+    console.log('📡 Response status:', response.status);
+    console.log('📡 Response headers:', response.headers.get('content-type'));
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('❌ Expected JSON but got:', text.substring(0, 200));
+      throw new Error('Server returned HTML instead of JSON');
+    }
+    
+    const data = await response.json();
+    console.log('📋 API response:', data);
+    
+    if (data.success) {
+      allQuestions = data.data.map(question => ({
+        id: question._id,
+        text: question.text
+      }));
+      console.log('✅ Processed questions:', allQuestions);
+    } else {
+      throw new Error(data.error || 'Failed to load questions');
+    }
+    
+    displayQuestions(allQuestions);
+  } catch (error) {
+    console.error('❌ Error loading questions:', error);
+    document.getElementById('questionsList').innerHTML = `
+      <div class="alert alert-danger">
+        <strong>Error loading questions:</strong><br>
+        ${error.message}
+      </div>
+    `;
+  }
+}
+
+// Display questions in modal
+function displayQuestions(questions) {
+  const questionsList = document.getElementById('questionsList');
+  
+  if (questions.length === 0) {
+    questionsList.innerHTML = '<div class="text-center py-3"><p class="text-muted">No questions found</p></div>';
+    return;
+  }
+  
+  const html = questions.map(question => {
+    const isSelected = selectedQuestions.some(q => q.id === question.id);
+    const buttonClass = isSelected ? 'btn-outline-secondary' : 'btn-primary';
+    const buttonText = isSelected ? 'Đã chọn' : 'Chọn';
+    const disabled = isSelected ? 'disabled' : '';
+    
+    return `
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <h6 class="mb-1">${question.text}</h6>
+        </div>
+        <button class="btn btn-sm ${buttonClass}" ${disabled} onclick="selectQuestion('${question.id}', '${question.text}')">
+          ${buttonText}
+        </button>
+      </div>
+    `;
+  }).join('');
+  
+  questionsList.innerHTML = `<div class="list-group">${html}</div>`;
+}
+
+// Filter questions based on search
+function filterQuestions() {
+  const searchTerm = document.getElementById('searchQuestion').value.toLowerCase();
+  const filteredQuestions = allQuestions.filter(question => 
+    question.text.toLowerCase().includes(searchTerm)
+  );
+  displayQuestions(filteredQuestions);
+}
+
+// Select question
+function selectQuestion(questionId, questionText) {
+  const question = { id: questionId, text: questionText };
+  selectedQuestions.push(question);
+  updateSelectedQuestions();
+  displayQuestions(allQuestions); // Refresh modal
+}
+
+// Remove question from selection
+function removeQuestion(questionId) {
+  selectedQuestions = selectedQuestions.filter(q => q.id !== questionId);
+  updateSelectedQuestions();
+  displayQuestions(allQuestions); // Refresh modal
+}
+
+// Update selected questions display
+function updateSelectedQuestions() {
+  const questionsList = document.getElementById('questionsList');
+  const questionCount = document.getElementById('questionCount');
+  
+  questionCount.textContent = `${selectedQuestions.length} questions`;
+  
+  if (selectedQuestions.length === 0) {
+    questionsList.innerHTML = `
+      <div class="text-center py-3">
+        <p class="text-muted">No questions added yet.</p>
+      </div>
+    `;
+  } else {
+    const html = selectedQuestions.map(question => `
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <h6 class="mb-1">${question.text}</h6>
+        </div>
+        <button class="btn btn-sm btn-outline-danger" onclick="removeQuestion('${question.id}')">
+          Remove
+        </button>
+      </div>
+    `).join('');
+    
+    questionsList.innerHTML = `<div class="list-group">${html}</div>`;
+  }
+}
+
+// Create new question
+function createNewQuestion() {
+  window.open('/questions/new', '_blank');
+}
+
+// Update form submission to include selected questions
+document.getElementById('createQuizForm').addEventListener('submit', function(e) {
+  // Add selected questions as hidden inputs
+  selectedQuestions.forEach((question, index) => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = `questions[${index}][id]`;
+    input.value = question.id;
+    this.appendChild(input);
+    
+    const textInput = document.createElement('input');
+    textInput.type = 'hidden';
+    textInput.name = `questions[${index}][text]`;
+    textInput.value = question.text;
+    this.appendChild(textInput);
+  });
+});
+</script>

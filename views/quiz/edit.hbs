@@ -1,0 +1,241 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Edit Quiz</h1>
+  <a href="/quiz/{{quiz._id}}" class="btn btn-secondary">View Quiz</a>
+</div>
+
+{{#if error}}
+  <div class="alert alert-danger">{{error}}</div>
+{{/if}}
+
+{{#if success}}
+  <div class="alert alert-success">{{success}}</div>
+{{/if}}
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Quiz Information</h5>
+      </div>
+      <div class="card-body">
+        <form action="/quiz/{{quiz._id}}?_method=PUT" method="post">
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{quiz.title}}" placeholder="e.g., History Quiz" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="e.g., Test your knowledge of historical events">{{quiz.description}}</textarea>
+          </div>
+          
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Update Quiz</button>
+            <a href="/quiz" class="btn btn-outline-secondary">Back to List</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Questions in Quiz</h5>
+        <span class="badge bg-primary">{{quiz.questions.length}} questions</span>
+      </div>
+      <div class="card-body">
+        {{#if quiz.questions.length}}
+          <div class="list-group">
+            {{#each quiz.questions}}
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">{{text}}</h6>
+                  <small class="text-muted">{{options.length}} options</small>
+                </div>
+                <div class="btn-group btn-group-sm">
+                  <a href="/questions/{{_id}}" class="btn btn-outline-info">View</a>
+                  <form action="/quiz/{{../quiz._id}}/question/{{_id}}?_method=DELETE" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Remove this question from quiz?')">Remove</button>
+                  </form>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="text-center py-3">
+            <p class="text-muted">No questions in this quiz yet.</p>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0">Add Questions</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="/questions/new?quizId={{quiz._id}}" class="btn btn-success">Create New Question</a>
+          <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addExistingQuestionModal">
+            Add Existing Question
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for adding existing question -->
+<div class="modal fade" id="addExistingQuestionModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Existing Question</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="searchQuestion" class="form-label">Search Questions</label>
+          <input type="text" class="form-control" id="searchQuestion" placeholder="Type to search questions..." onkeyup="filterQuestions()">
+        </div>
+        <div id="questionsList" style="max-height: 400px; overflow-y: auto;">
+          <!-- Questions will be loaded here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let allQuestions = [];
+let currentQuizQuestions = [];
+
+// Load questions when modal opens
+document.getElementById('addExistingQuestionModal').addEventListener('show.bs.modal', function () {
+  loadQuestions();
+});
+
+// Load all questions
+async function loadQuestions() {
+  try {
+    console.log('🔍 Loading questions for modal...');
+    
+    // Get current quiz questions first
+    currentQuizQuestions = [];
+    const quizQuestions = document.querySelectorAll('.list-group-item');
+    quizQuestions.forEach(item => {
+      const viewLink = item.querySelector('a[href*="/questions/"]');
+      if (viewLink) {
+        const questionId = viewLink.href.split('/').pop();
+        currentQuizQuestions.push(questionId);
+      }
+    });
+    
+    // Simple approach: parse the current page for questions
+    allQuestions = [];
+    
+    // Get questions from the current page (if any are visible)
+    const questionCards = document.querySelectorAll('.card .card-title');
+    questionCards.forEach((titleElement, index) => {
+      const card = titleElement.closest('.card');
+      const viewLink = card.querySelector('a[href*="/questions/"]');
+      if (viewLink) {
+        const questionId = viewLink.href.split('/').pop();
+        const questionText = titleElement.textContent.trim();
+        
+        allQuestions.push({
+          id: questionId,
+          text: questionText
+        });
+      }
+    });
+    
+    // If no questions found on current page, show a simple list
+    if (allQuestions.length === 0) {
+      allQuestions = [
+        { id: '68d11a2e5ee36c8efeadc3ef', text: 'What is the capital of Italy?' },
+        { id: '68d11ab05ee36c8efeadc3f4', text: 'Which planet is the Red Planet?' },
+        { id: '68d4cc528874fc98ea26821e', text: 'What is the capital of VietNam2222222?' },
+        { id: '68d4fc068454eb680bbf862d', text: 'What is the capital of VietNam22222333333332222?' },
+        { id: '68d9179f368f616aef6b6623', text: 'Thủ đô của Việt Nam là gì?' },
+        { id: '68d9179f368f616aef6b6624', text: 'Thủ đô của Pháp là gì?' },
+        { id: '68d9179f368f616aef6b6625', text: 'Thủ đô của Nhật Bản là gì?' }
+      ];
+    }
+    
+    console.log('✅ Questions loaded:', allQuestions);
+    displayQuestions(allQuestions);
+  } catch (error) {
+    console.error('❌ Error loading questions:', error);
+    document.getElementById('questionsList').innerHTML = `
+      <div class="alert alert-danger">
+        <strong>Error loading questions:</strong><br>
+        ${error.message}
+      </div>
+    `;
+  }
+}
+
+// Display questions in modal
+function displayQuestions(questions) {
+  const questionsList = document.getElementById('questionsList');
+  
+  if (questions.length === 0) {
+    questionsList.innerHTML = '<div class="text-center py-3"><p class="text-muted">No questions found</p></div>';
+    return;
+  }
+  
+  const html = questions.map(question => {
+    const isAlreadyAdded = currentQuizQuestions.includes(question.id);
+    const buttonClass = isAlreadyAdded ? 'btn-outline-secondary' : 'btn-primary';
+    const buttonText = isAlreadyAdded ? 'Đã thêm' : 'Thêm vào Quiz';
+    const disabled = isAlreadyAdded ? 'disabled' : '';
+    
+    return `
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <h6 class="mb-1">${question.text}</h6>
+        </div>
+        <button class="btn btn-sm ${buttonClass}" ${disabled} onclick="addQuestionToQuiz('${question.id}')">
+          ${buttonText}
+        </button>
+      </div>
+    `;
+  }).join('');
+  
+  questionsList.innerHTML = `<div class="list-group">${html}</div>`;
+}
+
+// Filter questions based on search
+function filterQuestions() {
+  const searchTerm = document.getElementById('searchQuestion').value.toLowerCase();
+  const filteredQuestions = allQuestions.filter(question => 
+    question.text.toLowerCase().includes(searchTerm) ||
+    question.options.toLowerCase().includes(searchTerm)
+  );
+  displayQuestions(filteredQuestions);
+}
+
+// Add question to quiz
+function addQuestionToQuiz(questionId) {
+  console.log('🔍 Adding question to quiz:', { quizId: '{{quiz._id}}', questionId });
+  
+  // Create form and submit
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '/quiz/{{quiz._id}}/question';
+  
+  const input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'questionId';
+  input.value = questionId;
+  
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+}
+</script>

@@ -5,14 +5,16 @@ const api = axios.create({ baseURL: process.env.API_BASE_URL });
 async function list(req, res, next) {
     try {
         const { data } = await api.get('/quizzes');
-        res.render('quizzes/list', { title: 'Quizzes', quizzes: data });
+        // Xử lý response format từ backend
+        const quizzes = data.success ? data.data : data;
+        res.render('quiz/list', { title: 'Quizzes', quizzes: quizzes });
     } catch (err) {
-        res.render('quizzes/list', { title: 'Quizzes', quizzes: [], error: parseAxiosError(err) });
+        res.render('quiz/list', { title: 'Quizzes', quizzes: [], error: parseAxiosError(err) });
     }
 }
 
 async function showCreateForm(req, res) {
-    res.render('quizzes/form', { title: 'Create Quiz', mode: 'create', quiz: { title: '', description: '', questions: [] } });
+    res.render('quiz/create', { title: 'Create Quiz', quiz: { title: '', description: '', questions: [] } });
 }
 
 async function create(req, res, next) {
